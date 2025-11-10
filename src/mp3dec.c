@@ -287,17 +287,16 @@ int MP3Decode(HMP3Decoder hMP3Decoder, unsigned char **inbuf, int *bytesLeft, sh
 	int prevBitOffset, sfBlockBits, huffBlockBits;
 	unsigned char *mainPtr;
 	MP3DecInfo *mp3DecInfo = (MP3DecInfo *)hMP3Decoder;
-//	ULONG32 ulTime;
-//	StartYield(&ulTime);
+
 	if (!mp3DecInfo)
 		return ERR_MP3_NULL_POINTER;
 
 	/* unpack frame header */
 	fhBytes = UnpackFrameHeader(mp3DecInfo, *inbuf);
-	if (fhBytes < 0)	
+	if (fhBytes < 0)
 		return ERR_MP3_INVALID_FRAMEHEADER;		/* don't clear outbuf since we don't know size (failed to parse header) */
 	*inbuf += fhBytes;
-	
+
 	/* unpack side info */
 	siBytes = UnpackSideInfo(mp3DecInfo, *inbuf);
 	if (siBytes < 0) {
@@ -306,6 +305,7 @@ int MP3Decode(HMP3Decoder hMP3Decoder, unsigned char **inbuf, int *bytesLeft, sh
 	}
 	*inbuf += siBytes;
 	*bytesLeft -= (fhBytes + siBytes);
+
 	
 	/* if free mode, need to calculate bitrate and nSlots manually, based on frame size */
 	if (mp3DecInfo->bitrate == 0 || mp3DecInfo->freeBitrateFlag) {
@@ -399,24 +399,23 @@ int MP3Decode(HMP3Decoder hMP3Decoder, unsigned char **inbuf, int *bytesLeft, sh
 			mainPtr += offset;
 			mainBits -= (8*offset - prevBitOffset + bitOffset);
 		}
-//		YieldIfRequired(&ulTime);
 		/* dequantize coefficients, decode stereo, reorder short blocks */
 		if (Dequantize(mp3DecInfo, gr) < 0) {
 			MP3ClearBadFrame(mp3DecInfo, outbuf);
-			return ERR_MP3_INVALID_DEQUANTIZE;			
+			return ERR_MP3_INVALID_DEQUANTIZE;
 		}
 
 		/* alias reduction, inverse MDCT, overlap-add, frequency inversion */
 		for (ch = 0; ch < mp3DecInfo->nChans; ch++)
 			if (IMDCT(mp3DecInfo, gr, ch) < 0) {
 				MP3ClearBadFrame(mp3DecInfo, outbuf);
-				return ERR_MP3_INVALID_IMDCT;			
+				return ERR_MP3_INVALID_IMDCT;
 			}
 
 		/* subband transform - if stereo, interleaves pcm LRLRLR */
 		if (Subband(mp3DecInfo, outbuf + gr*mp3DecInfo->nGranSamps*mp3DecInfo->nChans) < 0) {
 			MP3ClearBadFrame(mp3DecInfo, outbuf);
-			return ERR_MP3_INVALID_SUBBAND;			
+			return ERR_MP3_INVALID_SUBBAND;
 		}
 	}
 	return ERR_MP3_NONE;

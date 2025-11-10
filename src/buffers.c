@@ -145,15 +145,15 @@ MP3DecInfo *AllocateBuffers(void)
 	}
 #else
 
-	// Buffers:
-	static char s_mp3DecInfo[sizeof(MP3DecInfo)];
-	static char fh[sizeof(FrameHeader)];
-	static char si[sizeof(SideInfo)];
-	static char sfi[sizeof(ScaleFactorInfo)];
-	static char hi[sizeof(HuffmanInfo)];
-	static char di[sizeof(DequantInfo)];
-	static char mi[sizeof(IMDCTInfo)];
-	static char sbi[sizeof(SubbandInfo)];
+	// Buffers: (aligned to 4-byte boundary for ARM Cortex-M0+ compatibility)
+	static char s_mp3DecInfo[sizeof(MP3DecInfo)] __attribute__((aligned(4)));
+	static char fh[sizeof(FrameHeader)] __attribute__((aligned(4)));
+	static char si[sizeof(SideInfo)] __attribute__((aligned(4)));
+	static char sfi[sizeof(ScaleFactorInfo)] __attribute__((aligned(4)));
+	static char hi[sizeof(HuffmanInfo)] __attribute__((aligned(4)));
+	static char di[sizeof(DequantInfo)] __attribute__((aligned(4)));
+	static char mi[sizeof(IMDCTInfo)] __attribute__((aligned(4)));
+	static char sbi[sizeof(SubbandInfo)] __attribute__((aligned(4)));
 
 	mp3DecInfo = (MP3DecInfo *)s_mp3DecInfo;
 	ClearBuffer(mp3DecInfo, sizeof(MP3DecInfo));

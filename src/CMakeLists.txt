@@ -20,6 +20,10 @@ target_include_directories(picomp3lib INTERFACE
     .
     ../interface
 )
+target_compile_options(picomp3lib INTERFACE
+    -O2  # Override -Os for performance-critical MP3 decoding
+    -Wno-unused-parameter
+)
 target_link_libraries(picomp3lib INTERFACE
     pico_stdlib
 )
